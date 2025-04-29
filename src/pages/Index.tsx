@@ -8,9 +8,11 @@ const Index = () => {
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Bistro Order Vista</h1>
         <p className="text-xl text-gray-600 mb-8">Restaurant Order Management System</p>
-        <Link to="/orders">
-          <Button size="lg">View Orders</Button>
-        </Link>
+        <div className="space-x-4">
+          <Link to="/orders">
+            <Button size="lg">View Orders</Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

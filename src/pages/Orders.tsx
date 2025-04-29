@@ -11,13 +11,21 @@ import {
   getOrderStatistics,
   type Order 
 } from '@/data/mockOrders';
-import OrderCard from '@/components/OrderCard';
+import OrderStatusBadge from '@/components/OrderStatusBadge';
 import OrderFilterBar from '@/components/OrderFilterBar';
 import OrderTabs from '@/components/OrderTabs';
 import OrderStatisticsBar from '@/components/OrderStatisticsBar';
 import OrderGroupHeader from '@/components/OrderGroupHeader';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { ArrowLeft, Package, Truck } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const Orders = () => {
   const { toast } = useToast();
@@ -111,6 +119,13 @@ const Orders = () => {
       CANCELLED: mockOrders.filter(o => o.status === 'CANCELLED').length
     };
   }, []);
+
+  const getDeliveryTypeIcon = (order: Order) => {
+    if (order.delivery && order.delivery.address) {
+      return <Truck className="h-4 w-4 text-blue-500" />;
+    }
+    return <Package className="h-4 w-4 text-gray-500" />;
+  };
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -161,8 +176,9 @@ const Orders = () => {
           </div>
         ) : (
           <div className="space-y-8">
+            {/* Today's Orders */}
             {groupedOrders.today.length > 0 && (
-              <div>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
                 <OrderGroupHeader
                   title="Today"
                   count={groupedOrders.today.length}
@@ -170,27 +186,45 @@ const Orders = () => {
                   onToggle={() => toggleGroup('today')}
                 />
                 {expandedGroups.today && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedOrders.today.map(order => (
-                      <OrderCard 
-                        key={order.id} 
-                        order={{
-                          id: order.orderNumber,
-                          amount: order.amount,
-                          date: order.date,
-                          time: order.time,
-                          status: order.status
-                        }}
-                        onViewDetails={() => handleViewDetails(order.id)}
-                      />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedOrders.today.map(order => (
+                        <TableRow 
+                          key={order.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewDetails(order.id)}
+                        >
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>{order.time}</TableCell>
+                          <TableCell>{getDeliveryTypeIcon(order)}</TableCell>
+                          <TableCell>£{order.amount.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <OrderStatusBadge status={order.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
             
+            {/* Yesterday's Orders */}
             {groupedOrders.yesterday.length > 0 && (
-              <div>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
                 <OrderGroupHeader
                   title="Yesterday"
                   count={groupedOrders.yesterday.length}
@@ -198,27 +232,45 @@ const Orders = () => {
                   onToggle={() => toggleGroup('yesterday')}
                 />
                 {expandedGroups.yesterday && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedOrders.yesterday.map(order => (
-                      <OrderCard 
-                        key={order.id} 
-                        order={{
-                          id: order.orderNumber,
-                          amount: order.amount,
-                          date: order.date,
-                          time: order.time,
-                          status: order.status
-                        }}
-                        onViewDetails={() => handleViewDetails(order.id)}
-                      />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedOrders.yesterday.map(order => (
+                        <TableRow 
+                          key={order.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewDetails(order.id)}
+                        >
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>{order.time}</TableCell>
+                          <TableCell>{getDeliveryTypeIcon(order)}</TableCell>
+                          <TableCell>£{order.amount.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <OrderStatusBadge status={order.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
             
+            {/* This Week's Orders */}
             {groupedOrders.thisWeek.length > 0 && (
-              <div>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
                 <OrderGroupHeader
                   title="This Week"
                   count={groupedOrders.thisWeek.length}
@@ -226,27 +278,47 @@ const Orders = () => {
                   onToggle={() => toggleGroup('thisWeek')}
                 />
                 {expandedGroups.thisWeek && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedOrders.thisWeek.map(order => (
-                      <OrderCard 
-                        key={order.id} 
-                        order={{
-                          id: order.orderNumber,
-                          amount: order.amount,
-                          date: order.date,
-                          time: order.time,
-                          status: order.status
-                        }}
-                        onViewDetails={() => handleViewDetails(order.id)}
-                      />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedOrders.thisWeek.map(order => (
+                        <TableRow 
+                          key={order.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewDetails(order.id)}
+                        >
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>{order.date}</TableCell>
+                          <TableCell>{order.time}</TableCell>
+                          <TableCell>{getDeliveryTypeIcon(order)}</TableCell>
+                          <TableCell>£{order.amount.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <OrderStatusBadge status={order.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
             
+            {/* Last Week's Orders */}
             {groupedOrders.lastWeek.length > 0 && (
-              <div>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
                 <OrderGroupHeader
                   title="Last Week"
                   count={groupedOrders.lastWeek.length}
@@ -254,27 +326,47 @@ const Orders = () => {
                   onToggle={() => toggleGroup('lastWeek')}
                 />
                 {expandedGroups.lastWeek && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedOrders.lastWeek.map(order => (
-                      <OrderCard 
-                        key={order.id} 
-                        order={{
-                          id: order.orderNumber,
-                          amount: order.amount,
-                          date: order.date,
-                          time: order.time,
-                          status: order.status
-                        }}
-                        onViewDetails={() => handleViewDetails(order.id)}
-                      />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedOrders.lastWeek.map(order => (
+                        <TableRow 
+                          key={order.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewDetails(order.id)}
+                        >
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>{order.date}</TableCell>
+                          <TableCell>{order.time}</TableCell>
+                          <TableCell>{getDeliveryTypeIcon(order)}</TableCell>
+                          <TableCell>£{order.amount.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <OrderStatusBadge status={order.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
             
+            {/* Older Orders */}
             {groupedOrders.older.length > 0 && (
-              <div>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
                 <OrderGroupHeader
                   title="Older"
                   count={groupedOrders.older.length}
@@ -282,21 +374,40 @@ const Orders = () => {
                   onToggle={() => toggleGroup('older')}
                 />
                 {expandedGroups.older && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedOrders.older.map(order => (
-                      <OrderCard 
-                        key={order.id} 
-                        order={{
-                          id: order.orderNumber,
-                          amount: order.amount,
-                          date: order.date,
-                          time: order.time,
-                          status: order.status
-                        }}
-                        onViewDetails={() => handleViewDetails(order.id)}
-                      />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedOrders.older.map(order => (
+                        <TableRow 
+                          key={order.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewDetails(order.id)}
+                        >
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>{order.date}</TableCell>
+                          <TableCell>{order.time}</TableCell>
+                          <TableCell>{getDeliveryTypeIcon(order)}</TableCell>
+                          <TableCell>£{order.amount.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <OrderStatusBadge status={order.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
@@ -310,6 +421,7 @@ const Orders = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Order Details: {selectedOrder.orderNumber}</DialogTitle>
+              <DialogDescription>Complete information about this order</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="flex justify-between items-start">

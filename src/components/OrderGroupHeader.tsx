@@ -17,14 +17,14 @@ const OrderGroupHeader: React.FC<OrderGroupHeaderProps> = ({
   onToggle
 }) => {
   return (
-    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg mb-4">
+    <div className="flex items-center justify-between bg-white p-4 rounded-lg border-b border-gray-100 sticky top-0 z-10 shadow-sm mb-2">
       <div className="flex items-center">
-        <h3 className="font-medium">{title}</h3>
-        <span className="ml-2 bg-gray-200 text-gray-700 text-xs rounded-full px-2 py-0.5">
+        <h3 className="font-medium text-gray-800">{title}</h3>
+        <span className="ml-2 bg-gray-100 text-gray-700 text-xs rounded-full px-2 py-0.5">
           {count}
         </span>
       </div>
-      <Button variant="ghost" size="sm" onClick={onToggle}>
+      <Button variant="ghost" size="sm" onClick={onToggle} className="p-2">
         {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </Button>
     </div>

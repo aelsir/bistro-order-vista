@@ -2,7 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send } from 'lucide-react';
+import { Send, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ChatInputProps {
   value: string;
@@ -11,6 +12,8 @@ interface ChatInputProps {
   onSend: () => void;
   isLoading: boolean;
   placeholder?: string;
+  suggestions?: string[];
+  onSuggestionClick?: (suggestion: string) => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -19,10 +22,39 @@ const ChatInput: React.FC<ChatInputProps> = ({
   onKeyDown,
   onSend,
   isLoading,
-  placeholder = "Type your message..."
+  placeholder = "Type your message...",
+  suggestions,
+  onSuggestionClick
 }) => {
   return (
     <div className="relative">
+      {suggestions && suggestions.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {suggestions.map((suggestion, index) => (
+            <Button 
+              key={index} 
+              variant="secondary" 
+              size="sm" 
+              className="text-xs py-1 h-auto"
+              onClick={() => onSuggestionClick && onSuggestionClick(suggestion)}
+            >
+              {suggestion}
+            </Button>
+          ))}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Info className="h-4 w-4 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Suggested responses based on your history and common requests</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
       <Textarea
         value={value}
         onChange={onChange}
